@@ -12,13 +12,13 @@ const PLAYERS = [
     "Catwoman",
     "Fish",
     "Hulk",
-    "Ninja",
-    "Black Cat",
-    "Volverine",
+    "DeadPool",
+    "Black Panther",
+    "Dr Strange",
     "Thor",
     "Slayer",
     "Vader",
-    "Slingo"
+    "Thanos"
 ];
 
 // Player Class
@@ -32,6 +32,7 @@ class Player {
         this.selected = false;
         this.wins = 0;
     }
+
 
     // Get random strength
     getRandomStrength = () => {
@@ -87,7 +88,7 @@ class Superwar {
         team.append(fragment);
     }
 
-    // Build players fragment 
+    // Build players fragment
     buildPlayers = (type) => {
         let fragment = document.createDocumentFragment();
         this.filterPlayers(type)
@@ -123,6 +124,10 @@ class Superwar {
     isFight = () => {
         // Type your code here
 
+        return this.players.filter(function(player){
+          return (player.selected && player.strength > 0).length == 2;
+        }) ? "clash" : "peace";
+
         // return  'clash' or 'peace';
     }
 
@@ -131,6 +136,19 @@ class Superwar {
         // Filtered the selected players and calculate score
         // Should return HTML element with score
         // Type your code here
+        let p = this.players.filter(function(player){
+          return player.selected;
+        });
+
+        p.map(function(player){
+          if (player.strength > 0){
+            player.wins += 1;
+          }
+        });
+
+        let score = this.calculateScore();
+        let s = score["hero"] + " - " + score["villain"]
+        document.getElementById("score").innerHTML = s;
 
         if (this.checkWin() !== 'endure')
             setTimeout(() => this.announceWinner(score), 100);
@@ -140,6 +158,14 @@ class Superwar {
     calculateScore = () => {
         // Calculate and return the total score of teams
         // Type your code here
+        let score = this.players.reduce(function(score, player){
+          score[player.type] += player.wins;
+          return score;
+        }, {
+          "hero" : 0,
+          "villain" : 0
+        }
+      );
 
         return score;
     }
@@ -149,6 +175,10 @@ class Superwar {
         // Find the winner if exists return type hero or villain
         // If winner dosen't exists then return endure
         // Type your code here
+        let hs = this.totalStrength("hero");
+        let vs = this.totalStrength("villain");
+
+        return (vs == 0)? "hero" : (hs == 0)? "villain" : "endure";
 
       return result;
     }
@@ -157,6 +187,13 @@ class Superwar {
     totalStrength = (type) => {
         // Calculate and return the total strength of the team
         // Type your code here
+        let strength = 0;
+
+        this.players.map(function(player){
+          if(player.type == type){
+            strength += player.strength;
+          }
+        });
 
         return strength;
     }
